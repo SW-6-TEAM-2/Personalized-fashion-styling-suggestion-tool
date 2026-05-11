@@ -217,10 +217,17 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-# Test files
+# Test input/output files
 sample*.png
 sample*.jpg
+top*.png
+top*.jpg
+bottom*.png
+bottom*.jpg
+shoes*.png
+shoes*.jpg
 output*.png
+ootd_result*.png
 
 # Rembg model cache
 .u2net/
