@@ -1,5 +1,6 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
+*.pyc
 *.py[codz]
 *$py.class
 
@@ -19,6 +20,9 @@ lib64/
 parts/
 sdist/
 var/
+.vscode/
+.idea/
+data/
 wheels/
 share/python-wheels/
 *.egg-info/
