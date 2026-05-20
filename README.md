@@ -1,16 +1,11 @@
-# React + Vite
+# Personalized-fashion-styling-suggestion-tool
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+오픈소스 이미지 처리 라이브러리를 활용해 사용자만의 디지털 옷장을 만드는 프로젝트입니다.
 
-Currently, two official plugins are available:
+핵심 아이디어: 사용자가 가진 옷 사진을 업로드하면 배경을 제거(누끼)해주고, '워크웨어', '시티보이' 등 특정 스타일 키워드에 맞춰 오늘의 착장 (OOTD)을 추천해주는 웹 서비스입니다.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+<오픈소스 활용>
 
-## React Compiler
+이미지 처리: Rembg (AI 기반 배경 제거), Pillow (합성)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+웹 프레임워크: Streamlit (사진 업로드 버튼, 스타일 선택 슬라이더 등)
