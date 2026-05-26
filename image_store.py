@@ -66,9 +66,9 @@ for root, dirs, files in os.walk(base_path):
                 analysis_result = process_clothing_image(full_path, output_path)
                 
                 # 반환된 딕셔너리에서 데이터 추출 (K-means 알고리즘 결과물 수신)
-                h_val = analysis_result["rgb"][0]  # colorsys.rgb_to_hsv 인자 파싱 방식에 맞춰 
-                s_val = analysis_result["rgb"][1]  # h, s, v를 개별 리턴하지 않고 
-                v_val = analysis_result["rgb"][2]  # 분석 구조를 가졌으므로 딕셔너리 키값을 활용
+                h_val = analysis_result["h"] 
+                s_val = analysis_result["s"]
+                v_val = analysis_result["v"]
                 
                 # 정밀 추천을 위해 리턴값에 맞춰 가공하거나, 
                 # 임시로 rgb 값 혹은 분석된 속성값 (is_neutral)을 매핑
@@ -81,9 +81,9 @@ for root, dirs, files in os.walk(base_path):
                 cur.execute('''
                     INSERT INTO clothes (product_name, style, category, image_type, image_path, h, s, v, is_neutral)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (file_name, style_label, category, img_type, output_path, float(h_val), float(s_val), float(v_val), neutral_flag))
+                ''', (file_name, style_label, category, img_type, output_path, h_val, s_val, v_val, neutral_flag))
                 
-                print(f"등록 및 분석 완료: [{img_type} | {style_label}] {file_name} -> Type: {analysis_result['color_type']}")
+                print(f"등록 및 분석 완료: [{img_type} | {style_label}] {file_name} -> HSV({h_val:.2f}, {s_val:.2f}, {v_val:.2f})")
                 
             except Exception as e:
                 # 특정 이미지 분석 중 에러가 나더라도 전체 프로세스가 멈추지 않도록 예외 처리
