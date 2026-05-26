@@ -5,13 +5,14 @@ import ClothingCard from '../components/ClothingCard'
 import useClosetStore from '../store/useClosetStore'
 import { closetAPI } from '../api'
 
-const BG = '#181d22'
-const CARD = '#22292f'
-const BORDER = '#2e3a42'
-const TEXT = '#f8f2f0'
-const DIM = '#8a9ba8'
-const ACCENT = '#93fffd'
-const BTN_TEXT = '#4a4543'
+const BG = '#0d0d0d'
+const CARD = '#161616'
+const BORDER = '#282828'
+const TEXT = '#f0ece6'
+const DIM = '#6b6b6b'
+const ACCENT = '#ff6b35'
+const ACCENT_BTN = '#ff6b35'
+const BTN_TEXT = '#ffffff'
 
 const CATEGORIES = ['전체', '아우터', '상의', '원피스', '하의', 'acc']
 
@@ -47,7 +48,7 @@ export default function ClosetPage() {
 
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '40px 40px', minHeight: 'calc(100vh - 73px)', display: 'flex', flexDirection: 'column' }}>
         {/* 헤더 */}
-        <h2 style={{ color: TEXT, fontSize: 22, fontWeight: 700, marginBottom: 16 }}>내 옷장</h2>
+        <h2 className="font-heading" style={{ color: TEXT, fontSize: 22, fontWeight: 700, marginBottom: 16 }}>내 옷장</h2>
 
         {/* 카테고리 탭 + 옷 추가 버튼 (같은 행) */}
         <div className="flex items-center justify-between mb-6">
@@ -67,7 +68,7 @@ export default function ClosetPage() {
                 borderRadius: 8,
                 fontSize: 14,
                 fontWeight: selectedCategory === cat ? 600 : 400,
-                backgroundColor: selectedCategory === cat ? ACCENT : 'transparent',
+                backgroundColor: selectedCategory === cat ? ACCENT_BTN : 'transparent',
                 color: selectedCategory === cat ? BTN_TEXT : DIM,
                 border: 'none',
               }}
@@ -81,7 +82,7 @@ export default function ClosetPage() {
             onClick={() => navigate('/closet/add')}
             className="flex items-center gap-2 cursor-pointer hover:opacity-90 transition-opacity"
             style={{
-              backgroundColor: ACCENT, color: BTN_TEXT,
+              backgroundColor: ACCENT_BTN, color: BTN_TEXT,
               fontSize: 14, fontWeight: 600,
               padding: '10px 20px', borderRadius: 10, border: 'none',
             }}
@@ -100,7 +101,7 @@ export default function ClosetPage() {
             <p style={{ color: DIM, fontSize: 14 }}>아직 옷이 없어요</p>
             <button
               onClick={() => navigate('/closet/add')}
-              style={{ backgroundColor: ACCENT, color: BTN_TEXT, fontSize: 14, fontWeight: 600, padding: '10px 20px', borderRadius: 10, border: 'none', cursor: 'pointer' }}
+              style={{ backgroundColor: ACCENT_BTN, color: BTN_TEXT, fontSize: 14, fontWeight: 600, padding: '10px 20px', borderRadius: 10, border: 'none', cursor: 'pointer' }}
             >
               첫 번째 옷 추가하기
             </button>

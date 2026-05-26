@@ -1,16 +1,16 @@
 @import "tailwindcss";
 
 @theme {
-  --color-accent: #93fffd;
-  --color-accent-dark: #6ee8e6;
-  --color-bg: #181d22;
-  --color-card: #22292f;
-  --color-card2: #2a3138;
-  --color-border: #2e3a42;
-  --color-text: #f8f2f0;
-  --color-text-dim: #8a9ba8;
-  --color-tag: #526767;
-  --color-btn-text: #4a4543;
+  --color-accent: #d44f1f;
+  --color-accent-dark: #b8401a;
+  --color-bg: #0d0d0d;
+  --color-card: #161616;
+  --color-card2: #1e1e1e;
+  --color-border: #282828;
+  --color-text: #f0ece6;
+  --color-text-dim: #6b6b6b;
+  --color-tag: #1e1e1e;
+  --color-btn-text: #ffffff;
 }
 
 * {
@@ -20,10 +20,23 @@
 }
 
 body {
-  background-color: #181d22;
-  color: #f8f2f0;
-  font-family: 'Pretendard', 'Noto Sans KR', system-ui, sans-serif;
+  background-color: #0d0d0d;
+  color: #f0ece6;
+  font-family: 'Pretendard', system-ui, sans-serif;
   min-height: 100vh;
+}
+
+/* 로고 — Playfair Display (세리프로 개성) */
+.font-logo {
+  font-family: 'Playfair Display', serif;
+  letter-spacing: -0.01em;
+}
+
+/* 큰 제목 — Pretendard 볼드 */
+.font-heading {
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.03em;
 }
 
 #root {

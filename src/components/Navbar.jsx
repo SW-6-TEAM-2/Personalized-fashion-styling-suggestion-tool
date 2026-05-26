@@ -10,13 +10,13 @@ export default function Navbar() {
 
   return (
     <nav
-      className="flex items-center justify-between px-10 py-4 sticky top-0 z-50"
-      style={{ backgroundColor: '#181d22', borderBottom: '1px solid #2e3a42' }}
+      className="flex items-center justify-between sticky top-0 z-50"
+      style={{ backgroundColor: '#0d0d0d', borderBottom: '1px solid #282828', padding: '14px 40px' }}
     >
       {/* 로고 */}
       <span
-        className="font-bold cursor-pointer tracking-wide"
-        style={{ fontSize: 28, color: '#f8f2f0' }}
+        className="font-logo cursor-pointer"
+        style={{ fontSize: 26, fontWeight: 600, color: '#f8f2f0' }}
         onClick={() => navigate('/')}
       >
         dailycloset
@@ -31,7 +31,7 @@ export default function Navbar() {
             fontSize: 18,
             fontWeight: isActive('/closet') ? 600 : 400,
             color: isActive('/closet') ? '#ffffff' : '#f8f2f0',
-            borderBottom: isActive('/closet') ? '2px solid #93fffd' : '2px solid transparent',
+            borderBottom: isActive('/closet') ? '2px solid #d44f1f' : '2px solid transparent',
             paddingBottom: 2,
           }}
         >
@@ -44,7 +44,7 @@ export default function Navbar() {
             fontSize: 18,
             fontWeight: isActive('/ootd') ? 600 : 400,
             color: isActive('/ootd') ? '#ffffff' : '#f8f2f0',
-            borderBottom: isActive('/ootd') ? '2px solid #93fffd' : '2px solid transparent',
+            borderBottom: isActive('/ootd') ? '2px solid #d44f1f' : '2px solid transparent',
             paddingBottom: 2,
           }}
         >
@@ -58,8 +58,8 @@ export default function Navbar() {
           style={{
             width: 36, height: 36,
             borderRadius: '50%',
-            backgroundColor: '#2a3138',
-            border: '1px solid #2e3a42',
+            backgroundColor: '#1a1a1a',
+            border: '1px solid #282828',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}
         >
