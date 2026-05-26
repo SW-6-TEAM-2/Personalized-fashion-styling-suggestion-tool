@@ -52,7 +52,14 @@ def remove_background_and_normalize(input_path, output_path,
 
 
 def extract_dominant_color(image, k=KMEANS_CLUSTERS):
-    """K-means로 대표 색상 추출 + HSV 기반 분류."""
+    """K-means로 대표 색상 추출 + HSV 기반 분류.
+
+    반환 dict 구조:
+      - rgb, hex, color_type, is_neutral : 기존 필드 (호환성 유지)
+      - h, s, v                          : HSV 정밀값 (모두 0.0 ~ 1.0)
+      - dominant_ratio                   : 주색 클러스터 비중 (0.0 ~ 1.0)
+      - sub_rgb, sub_ratio               : 2등 클러스터 색상/비중 (보조색, 확장용)
+    """
     arr = np.array(image)
     mask = arr[:, :, 3] > 0
     pixels = arr[mask][:, :3]
@@ -71,12 +78,21 @@ def extract_dominant_color(image, k=KMEANS_CLUSTERS):
 
     labels = kmeans.labels_
     counts = np.bincount(labels)
-    dominant_cluster = np.argmax(counts)
-    dominant_rgb = kmeans.cluster_centers_[dominant_cluster].astype(int)
+    total = counts.sum()
 
+    # 비중 큰 순으로 정렬된 클러스터 인덱스
+    sorted_clusters = np.argsort(counts)[::-1]
+
+    # 주색 (1등 클러스터)
+    dominant_cluster = sorted_clusters[0]
+    dominant_rgb = kmeans.cluster_centers_[dominant_cluster].astype(int)
     r, g, b = int(dominant_rgb[0]), int(dominant_rgb[1]), int(dominant_rgb[2])
+    dominant_ratio = counts[dominant_cluster] / total
+
+    # HSV 변환 (모두 0.0 ~ 1.0 범위)
     h, s, v = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
 
+    # HSV 기반 5단계 분류
     if s < NEUTRAL_SAT_THRESHOLD:
         if v > 0.85:
             color_type = "white"
@@ -92,11 +108,34 @@ def extract_dominant_color(image, k=KMEANS_CLUSTERS):
         color_type = "vivid"
         is_neutral = False
 
+    # 보조색 (2등 클러스터, 패턴/배색 대응용)
+    if len(sorted_clusters) >= 2:
+        sub_cluster_idx = sorted_clusters[1]
+        sub_rgb_arr = kmeans.cluster_centers_[sub_cluster_idx].astype(int)
+        sub_r, sub_g, sub_b = int(sub_rgb_arr[0]), int(sub_rgb_arr[1]), int(sub_rgb_arr[2])
+        sub_ratio = counts[sub_cluster_idx] / total
+    else:
+        sub_r, sub_g, sub_b = r, g, b
+        sub_ratio = 0.0
+
     return {
+        # ── 기존 필드 (호환성 유지: image_store.py 그대로 작동) ──
         "rgb": (r, g, b),
         "hex": "#{:02X}{:02X}{:02X}".format(r, g, b),
         "color_type": color_type,
         "is_neutral": is_neutral,
+
+        # ── 신규: HSV 정밀값 (모두 0.0 ~ 1.0 범위) ──
+        "h": float(h),
+        "s": float(s),
+        "v": float(v),
+
+        # ── 신규: 주색 비중 (추천 신뢰도 가중치로 활용 가능) ──
+        "dominant_ratio": float(dominant_ratio),
+
+        # ── 신규: 보조색 (확장용, 현재 v1 추천 로직에서는 미사용해도 됨) ──
+        "sub_rgb": (sub_r, sub_g, sub_b),
+        "sub_ratio": float(sub_ratio),
     }
 
 
@@ -218,5 +257,8 @@ if __name__ == "__main__":
         print("  크기:        ", result["size"])
         print("  사용 모델:    ", result["model"])
         print("  대표 색상:    ", "RGB", result["rgb"], "/", result["hex"])
+        print("  HSV 정밀값:   ", f"H={result['h']:.3f}, S={result['s']:.3f}, V={result['v']:.3f}")
+        print("  주색 비중:    ", f"{result['dominant_ratio']:.1%}")
+        print("  보조색:      ", "RGB", result["sub_rgb"], f"(비중 {result['sub_ratio']:.1%})")
         print("  색상 분류:    ", result["color_type"])
         print("  무채색 여부:  ", result["is_neutral"])
