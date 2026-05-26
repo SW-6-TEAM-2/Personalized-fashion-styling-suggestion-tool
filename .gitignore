@@ -231,3 +231,8 @@ ootd_result*.png
 
 # Rembg model cache
 .u2net/
+# 수집한 데이터셋 (용량 + 저작권 이슈로 제외)
+data/
+
+# 테스트 이미지
+denim.png
