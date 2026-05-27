@@ -18,7 +18,13 @@ from sklearn.cluster import KMeans
 
 TARGET_SIZE = 800
 DEFAULT_MODEL = "isnet-general-use"
-KMEANS_CLUSTERS = 3
+# K-means 클러스터 개수
+# 의류 이미지 25장에 대한 Elbow method + Silhouette score 검증 결과,
+# K=4 지점에서 Inertia 감소율이 둔화되고(Elbow), Silhouette score도
+# 0.56으로 양호한 수준을 유지하여 K=4를 채택.
+# (이전: K=3 — "메인색상/그림자/하이라이트 3요소"라는 직관적 근거였으나,
+#  K-means가 의미적 분류를 하지 않는다는 점 + 데이터 검증 결과 미흡하여 수정)
+KMEANS_CLUSTERS = 4
 NEUTRAL_SAT_THRESHOLD = 0.15
 NEUTRAL_TONED_THRESHOLD = 0.35
 
