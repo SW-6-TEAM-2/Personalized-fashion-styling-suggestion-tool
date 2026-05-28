@@ -1,5 +1,6 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
+*.pyc
 *.py[codz]
 *$py.class
 
@@ -19,6 +20,9 @@ lib64/
 parts/
 sdist/
 var/
+.vscode/
+.idea/
+data/
 wheels/
 share/python-wheels/
 *.egg-info/
@@ -216,3 +220,11 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Test files
+sample*.png
+sample*.jpg
+output*.png
+
+# Rembg model cache
+.u2net/
