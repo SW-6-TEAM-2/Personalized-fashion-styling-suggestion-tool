@@ -3,12 +3,12 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import { ootdAPI } from '../api'
 
-const BG = '#0d0d0d'
-const BORDER = '#282828'
-const TEXT = '#f0ece6'
-const DIM = '#6b6b6b'
+const BG = '#ffffff'
+const BORDER = '#e8e8e8'
+const TEXT = '#111111'
+const DIM = '#999999'
 const ACCENT = '#ff6b35'
-const ACCENT_BTN = '#ff6b35'
+const ACCENT_BTN = '#111111'
 
 const BTN_TEXT = '#ffffff'
 

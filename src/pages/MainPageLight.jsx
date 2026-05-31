@@ -1,79 +1,81 @@
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import Navbar from '../components/Navbar'
+import { useNavigate, useLocation } from 'react-router-dom'
 import useAuthStore from '../store/useAuthStore'
 
-function getWeatherEmoji(code) {
-  if (code === 0) return '☀️'
-  if (code <= 2) return '🌤️'
-  if (code === 3) return '☁️'
-  if (code <= 48) return '🌫️'
-  if (code <= 55) return '🌦️'
-  if (code <= 65) return '🌧️'
-  if (code <= 77) return '🌨️'
-  if (code <= 82) return '🌦️'
-  if (code <= 99) return '⛈️'
-  return '⛅'
-}
-
-function getWeatherDesc(code) {
-  if (code === 0) return '맑음'
-  if (code <= 2) return '구름 조금'
-  if (code === 3) return '흐림'
-  if (code <= 48) return '안개'
-  if (code <= 55) return '이슬비'
-  if (code <= 65) return '비'
-  if (code <= 77) return '눈'
-  if (code <= 82) return '소나기'
-  if (code <= 99) return '뇌우'
-  return '흐림'
-}
-
-const BG = '#ffffff'
-const PANEL = '#f8f8f8'
-const BORDER = '#e8e8e8'
+// ── C안: White + Dark Charcoal + Orange ──
+const BG     = '#ffffff'
+const PANEL  = '#f8f8f8'
 const PANEL_BORDER = '#e8e8e8'
-const TEXT = '#111111'
-const DIM = '#999999'
-const ACCENT = '#ff6b35'
+const BORDER = '#e8e8e8'
+const NAV_BG = '#ffffff'
+const TEXT   = '#111111'
+const DIM    = '#999999'
+const ACCENT     = '#ff6b35'
 const ACCENT_BTN = '#111111'
-const BTN_TEXT = '#ffffff'
+const BTN_TEXT   = '#ffffff'
 const TAG_BG = '#f2f2f2'
 
 const STYLE_TAGS = ['#캐주얼', '#미니멀', '#스트릿', '#시티보이', '#오피스룩']
 
-export default function MainPage() {
+export default function MainPageLight() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { user } = useAuthStore()
   const name = user?.name || '사용자'
 
-  const [weather, setWeather] = useState(null)
-  const [city, setCity] = useState('Seoul')
-
-  useEffect(() => {
-    const fetchWeather = (lat, lon, cityName) => {
-      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=Asia%2FSeoul`)
-        .then(res => res.json())
-        .then(data => {
-          setWeather(data.current_weather)
-          setCity(cityName)
-        })
-        .catch(() => {})
-    }
-
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => fetchWeather(pos.coords.latitude, pos.coords.longitude, '현재 위치'),
-        () => fetchWeather(37.5665, 126.9780, 'Seoul')
-      )
-    } else {
-      fetchWeather(37.5665, 126.9780, 'Seoul')
-    }
-  }, [])
+  const isActive = (path) => location.pathname.startsWith(path)
 
   return (
     <div style={{ height: '100vh', backgroundColor: BG, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      <Navbar />
+
+      {/* ── 네비바 ── */}
+      <nav
+        className="flex items-center justify-between sticky top-0 z-50"
+        style={{ backgroundColor: NAV_BG, borderBottom: `1px solid ${BORDER}`, padding: '14px 40px' }}
+      >
+        <span
+          className="font-logo cursor-pointer"
+          style={{ fontSize: 26, fontWeight: 600, color: TEXT }}
+          onClick={() => navigate('/')}
+        >
+          dailycloset
+        </span>
+        <div className="flex items-center gap-8">
+          {[{ label: 'My Closet', path: '/closet' }, { label: 'OOTD', path: '/ootd' }].map(({ label, path }) => (
+            <button
+              key={path}
+              onClick={() => navigate(path)}
+              className="cursor-pointer transition-all"
+              style={{
+                fontSize: 18,
+                fontWeight: isActive(path) ? 600 : 400,
+                color: TEXT,
+                background: 'none',
+                border: 'none',
+                borderBottom: isActive(path) ? `2px solid ${ACCENT}` : '2px solid transparent',
+                paddingBottom: 2,
+              }}
+            >
+              {label}
+            </button>
+          ))}
+          <button
+            onClick={() => navigate('/profile')}
+            className="cursor-pointer"
+            style={{
+              width: 36, height: 36,
+              borderRadius: '50%',
+              backgroundColor: TAG_BG,
+              border: `1px solid ${BORDER}`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="8" r="4" stroke={TEXT} strokeWidth="1.5" />
+              <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke={TEXT} strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
+      </nav>
 
       <div
         className="flex items-stretch"
@@ -96,16 +98,10 @@ export default function MainPage() {
             className="flex items-center gap-3"
             style={{ backgroundColor: TAG_BG, border: `1px solid ${BORDER}`, borderRadius: 12, padding: '10px 16px', marginBottom: 20, width: 'fit-content' }}
           >
-            <span style={{ fontSize: 22 }}>
-              {weather ? getWeatherEmoji(weather.weathercode) : '⛅'}
-            </span>
+            <span style={{ fontSize: 22 }}>⛅</span>
             <div>
-              <p style={{ color: TEXT, fontSize: 15, fontWeight: 600 }}>
-                {weather ? `${Math.round(weather.temperature)}°` : '--°'}
-              </p>
-              <p style={{ color: DIM, fontSize: 11 }}>
-                {weather ? `${city} • ${getWeatherDesc(weather.weathercode)}` : 'Seoul • 날씨 불러오는 중'}
-              </p>
+              <p style={{ color: TEXT, fontSize: 15, fontWeight: 600 }}>--°</p>
+              <p style={{ color: DIM, fontSize: 11 }}>Seoul • 날씨 불러오는 중</p>
             </div>
           </div>
 
@@ -130,7 +126,7 @@ export default function MainPage() {
           </div>
         </div>
 
-        {/* ── 오른쪽 패널 — 비주얼 전용 ── */}
+        {/* ── 오른쪽 패널 ── */}
         <div
           className="flex flex-col"
           style={{

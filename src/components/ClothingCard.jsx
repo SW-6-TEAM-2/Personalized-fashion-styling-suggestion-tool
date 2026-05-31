@@ -1,9 +1,9 @@
 import { useNavigate } from 'react-router-dom'
 
-const CARD = '#22292f'
-const BORDER = '#2e3a42'
-const TEXT = '#f8f2f0'
-const DIM = '#8a9ba8'
+const CARD = '#f8f8f8'
+const BORDER = '#e8e8e8'
+const TEXT = '#111111'
+const DIM = '#999999'
 
 export default function ClothingCard({ item, onDelete }) {
   const navigate = useNavigate()
@@ -14,7 +14,7 @@ export default function ClothingCard({ item, onDelete }) {
       style={{ backgroundColor: CARD, border: `1px solid ${BORDER}` }}
       onClick={() => navigate(`/closet/${item.id}`)}
     >
-      <div className="aspect-square flex items-center justify-center p-4" style={{ backgroundColor: '#2a3138' }}>
+      <div className="aspect-square flex items-center justify-center p-4" style={{ backgroundColor: '#f2f2f2' }}>
         {item.imageUrl ? (
           <img src={item.imageUrl} alt={item.name} className="w-full h-full object-contain" />
         ) : (
@@ -26,7 +26,7 @@ export default function ClothingCard({ item, onDelete }) {
       {onDelete && (
         <div
           className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
-          style={{ backgroundColor: 'rgba(24,29,34,0.7)' }}
+          style={{ backgroundColor: 'rgba(0,0,0,0.45)' }}
         >
           <button
             onClick={e => { e.stopPropagation(); onDelete(item.id) }}

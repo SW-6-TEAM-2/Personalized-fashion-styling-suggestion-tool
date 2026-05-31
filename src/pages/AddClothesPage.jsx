@@ -5,14 +5,14 @@ import LoadingSpinner from '../components/LoadingSpinner'
 import useClosetStore from '../store/useClosetStore'
 import { closetAPI } from '../api'
 
-const BG = '#181d22'
-const CARD = '#22292f'
-const CARD2 = '#2a3138'
-const BORDER = '#2e3a42'
-const TEXT = '#f8f2f0'
-const DIM = '#8a9ba8'
-const ACCENT = '#93fffd'
-const BTN_TEXT = '#4a4543'
+const BG = '#ffffff'
+const CARD = '#f8f8f8'
+const CARD2 = '#f2f2f2'
+const BORDER = '#e8e8e8'
+const TEXT = '#111111'
+const DIM = '#999999'
+const ACCENT = '#ff6b35'
+const BTN_TEXT = '#ffffff'
 
 const CATEGORIES = ['아우터', '상의', '원피스', '하의', 'acc']
 const COLOR_TAGS = ['블랙', '화이트', '그레이', '네이비', '베이지', '브라운', '블루', '레드', '그린', '핑크']

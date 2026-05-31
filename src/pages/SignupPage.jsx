@@ -3,13 +3,13 @@ import { useNavigate, Link } from 'react-router-dom'
 import useAuthStore from '../store/useAuthStore'
 import { authAPI } from '../api'
 
-const BG = '#181d22'
-const CARD = '#22292f'
-const BORDER = '#2e3a42'
-const TEXT = '#f8f2f0'
-const DIM = '#8a9ba8'
-const ACCENT = '#93fffd'
-const BTN_TEXT = '#4a4543'
+const BG = '#ffffff'
+const CARD = '#f8f8f8'
+const BORDER = '#e8e8e8'
+const TEXT = '#111111'
+const DIM = '#999999'
+const ACCENT = '#ff6b35'
+const BTN_TEXT = '#ffffff'
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -75,27 +75,54 @@ export default function SignupPage() {
   ]
 
   return (
-    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: BG }}>
-      <div className="w-full max-w-md mx-4 rounded-2xl p-8" style={{ backgroundColor: CARD, border: `1px solid ${BORDER}` }}>
-        <h2 style={{ color: TEXT, fontSize: 22, fontWeight: 700, marginBottom: 4 }}>회원가입</h2>
-        <p style={{ color: DIM, fontSize: 13, marginBottom: 24 }}>나만의 옷장을 만들어보세요</p>
+    <div
+      style={{
+        height: '100vh',
+        backgroundColor: BG,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      {/* 로고 */}
+      <p
+        className="font-logo"
+        style={{ color: TEXT, fontSize: 22, fontWeight: 600, marginBottom: 36, letterSpacing: '-0.02em' }}
+      >
+        dailycloset
+      </p>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      {/* 회원가입 카드 */}
+      <div
+        style={{
+          width: '100%',
+          maxWidth: 460,
+          backgroundColor: CARD,
+          border: `1px solid ${BORDER}`,
+          borderRadius: 20,
+          padding: '44px 48px',
+        }}
+      >
+        <h2 style={{ color: TEXT, fontSize: 24, fontWeight: 700, marginBottom: 4 }}>회원가입</h2>
+        <p style={{ color: DIM, fontSize: 13, marginBottom: 32 }}>나만의 옷장을 만들어보세요</p>
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           {fields.map(({ label, name, type, placeholder }) => (
             <div key={name}>
-              <label style={{ color: DIM, fontSize: 12, display: 'block', marginBottom: 6 }}>{label}</label>
+              <label style={{ color: DIM, fontSize: 12, display: 'block', marginBottom: 8 }}>{label}</label>
               <input
                 type={type}
                 name={name}
                 value={form[name]}
                 onChange={handleChange}
                 placeholder={placeholder}
-                className="w-full outline-none"
+                className="w-full outline-none transition-all"
                 style={{
                   backgroundColor: BG,
                   border: `1px solid ${errors[name] ? '#ef4444' : BORDER}`,
                   borderRadius: 12,
-                  padding: '12px 16px',
+                  padding: '13px 16px',
                   color: TEXT,
                   fontSize: 14,
                 }}
@@ -115,20 +142,25 @@ export default function SignupPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full cursor-pointer disabled:opacity-60 hover:opacity-90 transition-opacity"
+            className="w-full cursor-pointer disabled:opacity-60 hover:opacity-90 transition-opacity flex items-center justify-between"
             style={{
-              backgroundColor: ACCENT, color: BTN_TEXT,
-              fontWeight: 600, fontSize: 15,
-              padding: '13px 0', borderRadius: 12, border: 'none', marginTop: 4,
+              backgroundColor: ACCENT,
+              color: BTN_TEXT,
+              fontWeight: 600,
+              fontSize: 15,
+              padding: '14px 20px',
+              borderRadius: 12,
+              border: 'none',
+              marginTop: 4,
             }}
           >
-            {loading ? '처리 중...' : '회원가입'}
+            {loading ? '처리 중...' : <><span>회원가입</span><span style={{ fontSize: 18 }}>→</span></>}
           </button>
         </form>
 
-        <p style={{ textAlign: 'center', color: DIM, fontSize: 12, marginTop: 20 }}>
+        <p style={{ textAlign: 'center', color: DIM, fontSize: 12, marginTop: 24 }}>
           이미 계정이 있으신가요?{' '}
-          <Link to="/login" style={{ color: ACCENT }}>로그인</Link>
+          <Link to="/login" style={{ color: ACCENT, fontWeight: 600 }}>로그인</Link>
         </p>
       </div>
     </div>
