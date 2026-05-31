@@ -26,6 +26,7 @@ dist-ssr
 
 # ===== Backend (Python) =====
 __pycache__/
+*.pyc
 *.py[codz]
 *$py.class
 *.so
@@ -40,6 +41,9 @@ lib64/
 parts/
 sdist/
 var/
+.vscode/
+.idea/
+data/
 wheels/
 *.egg-info/
 .installed.cfg
@@ -69,4 +73,13 @@ coverage.xml
 cython_debug/
 .abstra/
 .streamlit/secrets.toml
+
 tempCodeRunnerFile.py
+
+# Test files
+sample*.png
+sample*.jpg
+output*.png
+
+# Rembg model cache
+.u2net/
