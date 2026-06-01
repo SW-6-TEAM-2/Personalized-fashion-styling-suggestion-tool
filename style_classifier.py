@@ -249,12 +249,48 @@ def classify_style(image, model_name=DEFAULT_MODEL, temperature=8.0):
     # "실제로 잘 안 갈리는 모호한 옷"으로 본다.
     RAW_CONFIDENCE_MARGIN = 0.03
 
+    # ── 활용 계열(applicable_styles) ──
+    # "이 옷은 어떤 스타일 계열들에 두루 활용 가능한가"를 출력한다.
+    # 1등으로 단정하는 대신, 여러 스타일에 걸치는 옷은 그 계열들을 묶어 보여준다.
+    #
+    # 방식: 그 옷의 6개 raw 유사도를 최저~최고로 0~1 정규화한 뒤,
+    #   정규화 점수가 임계값 이상인 계열을 "활용 가능"으로 본다.
+    #   - CLIP 유사도는 옷마다 절대 범위가 달라(0.2~0.25 vs 0.28~0.32),
+    #     1등 대비 단순 비율은 거의 다 통과해 변별이 안 된다.
+    #   - 옷 내부에서 정규화하면 "그 옷 안에서의 상대적 두드러짐"을 보게 되어,
+    #     점수가 다닥다닥한 모호한 옷은 여러 계열, 1등만 튄 명확한 옷은
+    #     좁은 계열로 자연스럽게 갈린다.
+    APPLICABLE_NORM_THRESHOLD = 0.5  # 검증으로 조정 (0~1)
+
+    top_raw = float(sorted_cos[0])
+    min_raw = float(sorted_cos[-1])
+    span = top_raw - min_raw
+
+    applicable_styles = []
+    for i in order:
+        name = style_names[i]
+        raw_v = float(cos_sim[i])
+        if span > 1e-9:
+            norm = (raw_v - min_raw) / span  # 1등=1.0, 최저=0.0
+        else:
+            norm = 1.0  # 6개가 완전히 동일한 극단적 경우
+        if norm >= APPLICABLE_NORM_THRESHOLD or name == top_style:
+            applicable_styles.append(name)
+
+    # 5개 이상이 통과 = 스타일 특성이 거의 없는 무난한 옷.
+    # "전부 다"라는 무의미한 답 대신 별도 플래그로 알린다.
+    style_agnostic = len(applicable_styles) >= 5
+
     return {
         "top_style": top_style,
         "top_score": top_score,
         "margin": margin,
         "scores": scores,
         "is_confident": raw_margin >= RAW_CONFIDENCE_MARGIN,
+        # 활용 가능한 스타일 계열들 (1등 단정 대신 멀티라벨)
+        "applicable_styles": applicable_styles,
+        # 거의 모든 스타일에 무난 = 스타일 특성이 약한 옷
+        "style_agnostic": style_agnostic,
         # raw 코사인 유사도 (softmax 착시 진단용)
         "raw_scores": raw_scores,
         "raw_margin": raw_margin,
@@ -276,6 +312,17 @@ if __name__ == "__main__":
     print(f"  softmax margin: {result['margin']:.3f}  /  "
           f"raw 유사도 margin: {result['raw_margin']:.4f}")
     print(f"  판정: {'신뢰 가능' if result['is_confident'] else '모호함 (주의)'}")
+
+    # 활용 계열: 단정 대신 "두루 어울리는 스타일들"
+    apps = result["applicable_styles"]
+    if result["style_agnostic"]:
+        print(f"\n  ▶ 활용 계열: {' · '.join(apps)}")
+        print("    → 특정 스타일색이 옅어 거의 모든 스타일에 무난하게 어울립니다.")
+    elif len(apps) == 1:
+        print(f"\n  ▶ 활용 계열: {apps[0]} (이 스타일에 뚜렷)")
+    else:
+        print(f"\n  ▶ 활용 계열: {' · '.join(apps)}")
+        print(f"    → 이 옷은 위 {len(apps)}개 스타일에 두루 활용 가능합니다.")
 
     print("\n  전체 점수 (softmax % | raw 코사인유사도):")
     for style in result["scores"]:
