@@ -143,7 +143,7 @@ export default function MainPageLight() {
               Today's Look
             </p>
             <div className="flex gap-4">
-              {['상의', '하의', '아우터', 'acc'].map(cat => (
+              {['상의', '하의', '아우터', '신발'].map(cat => (
                 <div key={cat} className="flex flex-col items-center gap-1">
                   <span style={{ color: DIM, fontSize: 9 }}>{cat}</span>
                   <span style={{ color: TEXT, fontSize: 13, fontWeight: 700 }}>0</span>
