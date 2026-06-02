@@ -14,7 +14,7 @@ const DIM = '#999999'
 const ACCENT = '#ff6b35'
 const BTN_TEXT = '#ffffff'
 
-const CATEGORIES = ['아우터', '상의', '원피스', '하의', 'acc']
+const CATEGORIES = ['아우터', '상의', '원피스', '하의', '신발']
 const COLOR_TAGS = ['블랙', '화이트', '그레이', '네이비', '베이지', '브라운', '블루', '레드', '그린', '핑크']
 const MATERIAL_TAGS = ['면', '폴리', '니트', '데님', '울', '린넨', '가죽']
 

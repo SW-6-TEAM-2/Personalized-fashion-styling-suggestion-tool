@@ -16,7 +16,7 @@ const ACCENT_BTN = '#111111'
 const BTN_TEXT = '#ffffff'
 const TAG_BG = '#f2f2f2'
 
-const GENRES = ['#캐주얼', '#미니멀', '#스트릿', '#시티보이', '#오피스룩']
+const GENRES = ['#캐주얼', '#미니멀', '#클래식', '#스트릿', '#워크웨어', '#시티보이']
 
 export default function OOTDPage() {
   const navigate = useNavigate()
@@ -24,7 +24,6 @@ export default function OOTDPage() {
   const name = user?.name || '사용자'
 
   const [selectedGenres, setSelectedGenres] = useState([])
-  const [inputKeyword, setInputKeyword] = useState('')
   const [loading, setLoading] = useState(false)
 
   const toggleGenre = (genre) => {
@@ -35,10 +34,7 @@ export default function OOTDPage() {
 
   const handleRecommend = async () => {
     setLoading(true)
-    const keywords = [
-      ...selectedGenres,
-      ...inputKeyword.split(/[\s,]+/).filter(Boolean),
-    ]
+    const keywords = [...selectedGenres]
     try {
       const res = await ootdAPI.recommend({ keywords })
       navigate('/ootd/result', { state: { outfit: res.data, keywords } })
@@ -63,8 +59,8 @@ export default function OOTDPage() {
             무드예요?
           </h1>
           <p style={{ color: DIM, fontSize: 18, lineHeight: 1.8, marginBottom: 40 }}>
-            스타일 키워드를 고르거나<br />
-            직접 입력하면 OOTD를 추천해드려요.
+            스타일 키워드를 골라주시면<br />
+            딱 맞는 OOTD를 추천해드려요.
           </p>
 
           {/* 스타일 태그 */}
@@ -90,55 +86,6 @@ export default function OOTDPage() {
                 </button>
               )
             })}
-          </div>
-
-          {/* 키워드 직접 입력 */}
-          <div
-            className="flex items-center gap-3"
-            style={{
-              backgroundColor: CARD,
-              border: `1px solid ${BORDER}`,
-              borderRadius: 16,
-              padding: '16px 20px',
-              marginBottom: 20,
-            }}
-          >
-            <input
-              type="text"
-              value={inputKeyword}
-              onChange={e => setInputKeyword(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleRecommend()}
-              placeholder="예) 데이트룩, 출근룩, 편한 스타일..."
-              className="flex-1 outline-none"
-              style={{
-                backgroundColor: 'transparent',
-                color: TEXT,
-                fontSize: 16,
-                border: 'none',
-              }}
-            />
-            <button
-              onClick={handleRecommend}
-              disabled={loading}
-              className="flex items-center justify-center cursor-pointer disabled:opacity-60 hover:opacity-80 transition-opacity"
-              style={{
-                backgroundColor: ACCENT_BTN,
-                color: BTN_TEXT,
-                border: 'none',
-                borderRadius: 10,
-                width: 40,
-                height: 40,
-                flexShrink: 0,
-              }}
-            >
-              {loading ? (
-                <div style={{ width: 16, height: 16, border: `2px solid ${BTN_TEXT}`, borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
-              ) : (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                  <path d="M5 12h14M13 6l6 6-6 6" stroke={BTN_TEXT} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              )}
-            </button>
           </div>
 
           {/* CTA 버튼 */}

@@ -40,7 +40,7 @@ const ACCENT_BTN = '#111111'
 const BTN_TEXT = '#ffffff'
 const TAG_BG = '#f2f2f2'
 
-const STYLE_TAGS = ['#캐주얼', '#미니멀', '#스트릿', '#시티보이', '#오피스룩']
+const STYLE_TAGS = ['#캐주얼', '#미니멀', '#클래식', '#스트릿', '#시티보이', '#워크웨어']
 
 export default function MainPage() {
   const navigate = useNavigate()
@@ -141,13 +141,10 @@ export default function MainPage() {
             padding: '40px 52px',
           }}
         >
-          {/* 상단: 라벨 + stats */}
-          <div className="flex items-center justify-between" style={{ marginBottom: 20, flexShrink: 0 }}>
-            <p style={{ color: DIM, fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-              Today's Look
-            </p>
+          {/* 상단: stats */}
+          <div className="flex items-center justify-end" style={{ marginBottom: 20, flexShrink: 0 }}>
             <div className="flex gap-4">
-              {['상의', '하의', '아우터', 'acc'].map(cat => (
+              {['상의', '하의', '아우터', '신발'].map(cat => (
                 <div key={cat} className="flex flex-col items-center gap-1">
                   <span style={{ color: DIM, fontSize: 9 }}>{cat}</span>
                   <span style={{ color: TEXT, fontSize: 13, fontWeight: 700 }}>0</span>

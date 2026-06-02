@@ -31,11 +31,10 @@ export default function Navbar() {
             fontSize: 18,
             fontWeight: isActive('/closet') ? 600 : 400,
             color: '#111111',
-            borderBottom: isActive('/closet') ? '2px solid #ff6b35' : '2px solid transparent',
-            paddingBottom: 2,
             background: 'none',
             border: 'none',
             borderBottom: isActive('/closet') ? '2px solid #ff6b35' : '2px solid transparent',
+            paddingBottom: 2,
           }}
         >
           My Closet

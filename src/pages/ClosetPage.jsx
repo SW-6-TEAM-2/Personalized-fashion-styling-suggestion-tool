@@ -14,7 +14,7 @@ const ACCENT = '#ff6b35'
 const ACCENT_BTN = '#111111'
 const BTN_TEXT = '#ffffff'
 
-const CATEGORIES = ['전체', '아우터', '상의', '원피스', '하의', 'acc']
+const CATEGORIES = ['전체', '아우터', '상의', '원피스', '하의', '신발']
 
 export default function ClosetPage() {
   const navigate = useNavigate()
