@@ -81,5 +81,25 @@ sample*.png
 sample*.jpg
 output*.png
 
+# Streamlit
+.streamlit/secrets.toml
+
+# Test input/output files
+sample*.png
+sample*.jpg
+top*.png
+top*.jpg
+bottom*.png
+bottom*.jpg
+shoes*.png
+shoes*.jpg
+output*.png
+ootd_result*.png
+
 # Rembg model cache
 .u2net/
+# ������ �����ͼ� (�뷮 + ���۱� �̽��� ����)
+data/
+
+# �׽�Ʈ �̹���
+denim.png
