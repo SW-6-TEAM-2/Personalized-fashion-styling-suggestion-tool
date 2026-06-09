@@ -10,8 +10,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 service = Service(ChromeDriverManager().install())
 driver = webdriver.Chrome(service=service)
 
-# 무신사 검색 페이지 이동 (예: 워크웨어/시티보이 의류/코디 검색 결과)
-driver.get("https://www.musinsa.com/search/goods?keyword=%EC%9B%8C%ED%81%AC%EC%9B%A8%EC%96%B4&gf=A")
+# 무신사 검색 페이지 이동 (예: 워크웨어, 시티보이, 클래식, 미니멀, 캐주얼, 스트릿 단품/코디 검색 결과)
+driver.get("https://www.musinsa.com/search/goods?keyword=%EC%9B%8C%ED%81%AC%EC%9B%A8%EC%96%B4&gf=F&category=103")
 
 # 스크롤을 3번 반복해서 내림
 for i in range(3):
@@ -29,7 +29,7 @@ for idx, img in enumerate(img_elements[:30]):
     url = img.get_attribute("src")
 
     # 2. 이미지 파일 저장
-    file_path = f"data/cloth_{idx}.jpg"
+    file_path = f"data/reference/single/shoes/workwear/woman/winter/cloth_{idx}.jpg"
     urllib.request.urlretrieve(url, file_path)
 
 driver.quit() # 브라우저 종료
