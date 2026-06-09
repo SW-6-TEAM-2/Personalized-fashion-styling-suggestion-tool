@@ -54,52 +54,62 @@ export default function ClothesDetailPage() {
   if (!item) return null
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: BG }}>
+    <div style={{ minHeight: '100vh', backgroundColor: BG }}>
       <Navbar />
 
-      <div className="max-w-2xl mx-auto px-6 py-8">
+      <div style={{ maxWidth: 860, margin: '0 auto', padding: '40px 40px' }}>
+        {/* 뒤로가기 */}
         <button
           onClick={() => navigate(-1)}
-          style={{ color: DIM, fontSize: 13, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, marginBottom: 24 }}
+          style={{ color: DIM, fontSize: 13, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 32 }}
           onMouseEnter={e => e.currentTarget.style.color = TEXT}
           onMouseLeave={e => e.currentTarget.style.color = DIM}
         >
           ← 뒤로
         </button>
 
-        <div className="flex gap-8">
-          {/* 이미지 */}
-          <div
-            className="w-52 h-64 rounded-2xl flex items-center justify-center flex-shrink-0"
-            style={{ backgroundColor: CARD, border: `1px solid ${BORDER}` }}
-          >
-            {item.imageUrl ? (
-              <img src={item.imageUrl} alt={item.name} className="w-full h-full object-contain p-4" />
-            ) : (
-              <span style={{ color: DIM, fontSize: 13 }}>이미지 없음</span>
-            )}
+        <div style={{ display: 'flex', gap: 48, alignItems: 'flex-start' }}>
+
+          {/* ── 왼쪽: 이미지 ── */}
+          <div style={{ flexShrink: 0, width: 320 }}>
+            <div style={{
+              width: '100%', aspectRatio: '3/4', borderRadius: 20,
+              backgroundColor: CARD, border: `1px solid ${BORDER}`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
+            }}>
+              {item.imageUrl ? (
+                <img src={item.imageUrl} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 24 }} />
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 40, opacity: 0.2 }}>
+                    {item.category === '상의' ? '👕' : item.category === '하의' ? '👖' : item.category === '아우터' ? '🧥' : '👟'}
+                  </span>
+                  <span style={{ color: DIM, fontSize: 12 }}>이미지 없음</span>
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* 정보 */}
-          <div className="flex-1 flex flex-col gap-4">
+          {/* ── 오른쪽: 정보 ── */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 28, paddingTop: 8 }}>
+
             <div>
-              <h2 style={{ color: TEXT, fontSize: 20, fontWeight: 600 }}>{item.name}</h2>
-              <span
-                style={{ display: 'inline-block', fontSize: 11, padding: '2px 10px', borderRadius: 20, backgroundColor: TAG_BG, color: DIM, border: `1px solid ${BORDER}`, marginTop: 4 }}
-              >
+              <span style={{ fontSize: 11, color: DIM, letterSpacing: '0.1em', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
                 {item.category}
               </span>
+              <h1 style={{ fontSize: 28, fontWeight: 700, color: TEXT, letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+                {item.name}
+              </h1>
             </div>
+
+            <div style={{ height: 1, backgroundColor: BORDER }} />
 
             {item.colors?.length > 0 && (
               <div>
-                <p style={{ color: DIM, fontSize: 11, marginBottom: 6 }}>색상</p>
-                <div className="flex flex-wrap gap-1.5">
+                <p style={{ color: DIM, fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>색상</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                   {item.colors.map((tag) => (
-                    <span
-                      key={tag}
-                      style={{ padding: '3px 10px', borderRadius: 20, fontSize: 12, color: ACCENT, backgroundColor: `${ACCENT}15`, border: `1px solid ${ACCENT}40` }}
-                    >
+                    <span key={tag} style={{ padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 500, color: ACCENT, backgroundColor: `${ACCENT}12`, border: `1px solid ${ACCENT}35` }}>
                       {tag}
                     </span>
                   ))}
@@ -109,13 +119,10 @@ export default function ClothesDetailPage() {
 
             {item.materials?.length > 0 && (
               <div>
-                <p style={{ color: DIM, fontSize: 11, marginBottom: 6 }}>소재</p>
-                <div className="flex flex-wrap gap-1.5">
+                <p style={{ color: DIM, fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>소재</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                   {item.materials.map((tag) => (
-                    <span
-                      key={tag}
-                      style={{ padding: '3px 10px', borderRadius: 20, fontSize: 12, color: DIM, backgroundColor: TAG_BG, border: `1px solid ${BORDER}` }}
-                    >
+                    <span key={tag} style={{ padding: '5px 14px', borderRadius: 20, fontSize: 12, color: TEXT, backgroundColor: TAG_BG, border: `1px solid ${BORDER}` }}>
                       {tag}
                     </span>
                   ))}
@@ -123,27 +130,24 @@ export default function ClothesDetailPage() {
               </div>
             )}
 
-            <div className="flex flex-col gap-2 mt-auto">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 8 }}>
               {fromOOTD && (
                 <button
                   onClick={() => navigate(-1)}
-                  className="w-full py-2.5 rounded-xl font-medium text-sm cursor-pointer hover:opacity-90 transition-opacity"
-                  style={{ backgroundColor: '#111111', color: '#ffffff', border: 'none' }}
+                  style={{ width: '100%', padding: '13px 20px', borderRadius: 12, backgroundColor: '#111111', color: '#ffffff', fontSize: 14, fontWeight: 600, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
                 >
-                  코디로 돌아가기
+                  코디로 돌아가기 <span>→</span>
                 </button>
               )}
               <button
                 onClick={() => navigate('/closet')}
-                className="w-full py-2.5 rounded-xl font-medium text-sm cursor-pointer hover:opacity-80 transition-opacity"
-                style={{ backgroundColor: TAG_BG, color: TEXT, border: `1px solid ${BORDER}` }}
+                style={{ width: '100%', padding: '13px 20px', borderRadius: 12, backgroundColor: TAG_BG, color: TEXT, fontSize: 14, fontWeight: 500, border: `1px solid ${BORDER}`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
               >
-                옷장으로 가기
+                옷장으로 가기 <span style={{ color: DIM }}>→</span>
               </button>
               <button
                 onClick={handleDelete}
-                className="w-full py-2.5 rounded-xl font-medium text-sm cursor-pointer hover:opacity-80 transition-opacity"
-                style={{ backgroundColor: 'transparent', color: '#ef4444', border: '1px solid #fca5a5' }}
+                style={{ width: '100%', padding: '11px 20px', borderRadius: 12, backgroundColor: 'transparent', color: '#ef4444', fontSize: 13, fontWeight: 500, border: '1px solid #fca5a5', cursor: 'pointer' }}
               >
                 삭제
               </button>

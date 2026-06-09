@@ -5,7 +5,8 @@
   1. 배경 제거 (Rembg / 모델 선택 가능)
   2. 정사각 캔버스 정규화 (800x800 RGBA PNG)
   3. 대표 색상 추출 (K-means + HSV)
-  4. OOTD 합성 (상/하/신발 -> 800x1200 코디)
+  4. CLIP 임베딩 추출 (스타일 유사도용)
+  5. OOTD 합성 (상/하/신발 -> 800x1200 코디)
 """
 
 import io
@@ -15,9 +16,29 @@ from PIL import Image
 import numpy as np
 from sklearn.cluster import KMeans
 
+# CLIP 유틸리티 (없으면 임베딩/분류 비활성화)
+try:
+    from clip_utils import embed_image as _clip_embed, classify_style as _clip_classify
+    HAS_CLIP = True
+except Exception:
+    HAS_CLIP = False
+    def _clip_embed(img): return None
+    def _clip_classify(emb): return None
+
 
 TARGET_SIZE = 800
 DEFAULT_MODEL = "isnet-general-use"
+
+# rembg 세션 전역 캐시 — 서버 시작 시 1회만 로드
+_rembg_session = None
+
+def _get_rembg_session(model=DEFAULT_MODEL):
+    global _rembg_session
+    if _rembg_session is None:
+        print(f"[rembg] Loading model: {model}")
+        _rembg_session = new_session(model)
+        print("[rembg] Model loaded OK")
+    return _rembg_session
 # K-means 클러스터 개수
 # 의류 이미지 25장에 대한 Elbow method + Silhouette score 검증 결과,
 # K=4 지점에서 Inertia 감소율이 둔화되고(Elbow), Silhouette score도
@@ -37,7 +58,7 @@ def remove_background_and_normalize(input_path, output_path,
                                     target_size=TARGET_SIZE,
                                     model=DEFAULT_MODEL):
     """배경 제거 + 정사각 캔버스 정규화."""
-    session = new_session(model)
+    session = _get_rembg_session(model)  # 캐시된 세션 재사용
 
     with open(input_path, "rb") as f:
         input_bytes = f.read()
@@ -48,7 +69,15 @@ def remove_background_and_normalize(input_path, output_path,
     if bbox:
         img = img.crop(bbox)
 
-    img.thumbnail((target_size, target_size), Image.LANCZOS)
+    # 옷이 캔버스의 최대 80%만 차지하도록 강제 (양쪽 10% 여백 보장)
+    # → 어떤 옷이든 캔버스 내 점유율이 균일해져 플랫레이에서 크기가 일정하게 보임
+    CLOTHING_MAX_RATIO = 0.80
+    max_dim = int(target_size * CLOTHING_MAX_RATIO)  # 800 * 0.8 = 640px
+
+    ratio = min(max_dim / img.width, max_dim / img.height)
+    new_size = (int(img.width * ratio), int(img.height * ratio))
+    img = img.resize(new_size, Image.LANCZOS)
+
     canvas = Image.new("RGBA", (target_size, target_size), (0, 0, 0, 0))
     offset = ((target_size - img.width) // 2, (target_size - img.height) // 2)
     canvas.paste(img, offset, img)
@@ -114,7 +143,7 @@ def extract_dominant_color(image, k=KMEANS_CLUSTERS):
         color_type = "vivid"
         is_neutral = False
 
-    # 보조색 (2등 클러스터, 패턴/배색 대응용)
+    # 보조색 (2등 클러스터)
     if len(sorted_clusters) >= 2:
         sub_cluster_idx = sorted_clusters[1]
         sub_rgb_arr = kmeans.cluster_centers_[sub_cluster_idx].astype(int)
@@ -124,37 +153,69 @@ def extract_dominant_color(image, k=KMEANS_CLUSTERS):
         sub_r, sub_g, sub_b = r, g, b
         sub_ratio = 0.0
 
+    sub_h, sub_s, sub_v = colorsys.rgb_to_hsv(sub_r / 255, sub_g / 255, sub_b / 255)
+
+    # ── 패턴 복잡도 ──────────────────────────────────────────────────────────
+    # color_variance: 옷 픽셀 RGB 채널별 표준편차 평균 (0~255 범위)
+    #   높을수록 색상이 다양하게 분포 → 패턴/그래픽 아이템
+    #   낮을수록 색이 균일 → 단색 아이템
+    color_variance = float(np.std(pixels_sample.astype(np.float32), axis=0).mean())
+
+    # is_patterned: 두 지표 중 하나라도 해당되면 패턴 아이템으로 분류
+    #   1) dominant_ratio < 0.45 → 1등 색상이 전체의 절반 미만 (색이 분산)
+    #   2) color_variance > 35   → RGB 분산이 큼 (다채로운 색상 분포)
+    is_patterned = bool(dominant_ratio < 0.45 or color_variance > 35)
+
     return {
-        # ── 기존 필드 (호환성 유지: image_store.py 그대로 작동) ──
         "rgb": (r, g, b),
         "hex": "#{:02X}{:02X}{:02X}".format(r, g, b),
         "color_type": color_type,
         "is_neutral": is_neutral,
-
-        # ── 신규: HSV 정밀값 (모두 0.0 ~ 1.0 범위) ──
         "h": float(h),
         "s": float(s),
         "v": float(v),
-
-        # ── 신규: 주색 비중 (추천 신뢰도 가중치로 활용 가능) ──
         "dominant_ratio": float(dominant_ratio),
-
-        # ── 신규: 보조색 (확장용, 현재 v1 추천 로직에서는 미사용해도 됨) ──
-        "sub_rgb": (sub_r, sub_g, sub_b),
+        "color_variance": color_variance,
+        "is_patterned":   is_patterned,
+        "sub_rgb":   (sub_r, sub_g, sub_b),
         "sub_ratio": float(sub_ratio),
+        "sub_h":     float(sub_h),
+        "sub_s":     float(sub_s),
+        "sub_v":     float(sub_v),
+    }
+
+
+def analyze_existing_image(image_path):
+    """
+    이미 배경 제거된 이미지에서 색상 추출 + CLIP 임베딩만 수행.
+    배경 제거를 다시 실행하지 않음.
+    """
+    img        = Image.open(image_path).convert("RGBA")
+    color_info = extract_dominant_color(img)
+    embedding  = _clip_embed(img)
+    style_tag  = _clip_classify(embedding)
+
+    return {
+        "embedding": embedding,
+        "style_tag": style_tag,
+        **color_info,
     }
 
 
 def process_clothing_image(input_path, output_path, model=DEFAULT_MODEL):
-    """단품 이미지 처리: 배경 제거 + 정규화 + 색상 추출."""
+    """단품 이미지 처리: 배경 제거 + 정규화 + 색상 추출 + CLIP 임베딩 + 스타일 분류."""
     processed_img = remove_background_and_normalize(input_path, output_path,
                                                     model=model)
     color_info = extract_dominant_color(processed_img)
+    embedding  = _clip_embed(processed_img)   # CLIP 없으면 None
+    style_tag  = _clip_classify(embedding)    # 예: "#캐주얼", CLIP 없으면 None
 
     return {
-        "path": output_path,
-        "size": (TARGET_SIZE, TARGET_SIZE),
-        "model": model,
+        "path":      output_path,
+        "size":      (TARGET_SIZE, TARGET_SIZE),
+        "model":     model,
+        "embedding": embedding,
+        "style_tag": style_tag,
         **color_info,
     }
 

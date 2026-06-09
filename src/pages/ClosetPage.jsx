@@ -14,7 +14,7 @@ const ACCENT = '#ff6b35'
 const ACCENT_BTN = '#111111'
 const BTN_TEXT = '#ffffff'
 
-const CATEGORIES = ['전체', '아우터', '상의', '원피스', '하의', '신발']
+const CATEGORIES = ['전체', '아우터', '상의', '하의', '신발']
 
 export default function ClosetPage() {
   const navigate = useNavigate()
@@ -51,7 +51,7 @@ export default function ClosetPage() {
         <h2 className="font-heading" style={{ color: TEXT, fontSize: 22, fontWeight: 700, marginBottom: 16 }}>내 옷장</h2>
 
         {/* 카테고리 탭 + 옷 추가 버튼 (같은 행) */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between" style={{ marginBottom: 28 }}>
           <div
             className="flex items-center gap-1"
             style={{ backgroundColor: CARD, borderRadius: 12, padding: 4 }}
@@ -107,7 +107,7 @@ export default function ClosetPage() {
             </button>
           </div>
         ) : (
-          <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))' }}>
+          <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))' }}>
             {filtered.map(item => (
               <ClothingCard key={item.id} item={item} onDelete={handleDelete} />
             ))}

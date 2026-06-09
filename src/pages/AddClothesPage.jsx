@@ -14,9 +14,7 @@ const DIM = '#999999'
 const ACCENT = '#ff6b35'
 const BTN_TEXT = '#ffffff'
 
-const CATEGORIES = ['아우터', '상의', '원피스', '하의', '신발']
-const COLOR_TAGS = ['블랙', '화이트', '그레이', '네이비', '베이지', '브라운', '블루', '레드', '그린', '핑크']
-const MATERIAL_TAGS = ['면', '폴리', '니트', '데님', '울', '린넨', '가죽']
+const CATEGORIES = ['아우터', '상의', '하의', '신발']
 
 export default function AddClothesPage() {
   const navigate = useNavigate()
@@ -30,8 +28,8 @@ export default function AddClothesPage() {
   const [form, setForm] = useState({
     name: '',
     category: '상의',
-    colors: [],
-    materials: [],
+    sleeveType: null,
+    bottomLength: null,
   })
 
   const handleFileChange = async (e) => {
@@ -54,16 +52,6 @@ export default function AddClothesPage() {
     }
   }
 
-  const toggleTag = (type, tag) => {
-    setForm((prev) => {
-      const arr = prev[type]
-      return {
-        ...prev,
-        [type]: arr.includes(tag) ? arr.filter((t) => t !== tag) : [...arr, tag],
-      }
-    })
-  }
-
   const handleSave = async () => {
     if (!form.name.trim()) {
       alert('옷 이름을 입력해주세요.')
@@ -72,11 +60,16 @@ export default function AddClothesPage() {
     setStep('saving')
     try {
       const formData = new FormData()
-      formData.append('image', originalFile)
+      // remove-bg 결과가 있으면 그걸 재사용 (배경제거 재실행 방지)
+      if (removedBgUrl && removedBgUrl.startsWith('/static/')) {
+        formData.append('processed_url', removedBgUrl)
+      } else {
+        formData.append('image', originalFile)
+      }
       formData.append('name', form.name)
       formData.append('category', form.category)
-      formData.append('colors', JSON.stringify(form.colors))
-      formData.append('materials', JSON.stringify(form.materials))
+      if (form.sleeveType)   formData.append('sleeve_type', form.sleeveType)
+      if (form.bottomLength) formData.append('bottom_length', form.bottomLength)
       const res = await closetAPI.add(formData)
       addCloth(res.data)
       navigate('/closet')
@@ -221,49 +214,55 @@ export default function AddClothesPage() {
                 </div>
               </div>
 
-              {/* 색상 태그 */}
-              <div>
-                <label style={{ color: DIM, fontSize: 12, display: 'block', marginBottom: 6 }}>색상</label>
-                <div className="flex flex-wrap gap-2">
-                  {COLOR_TAGS.map((tag) => (
-                    <button
-                      key={tag}
-                      onClick={() => toggleTag('colors', tag)}
-                      className="cursor-pointer transition-colors"
-                      style={{
-                        padding: '5px 12px', borderRadius: 20, fontSize: 12,
-                        backgroundColor: form.colors.includes(tag) ? `${ACCENT}20` : CARD,
-                        color: form.colors.includes(tag) ? ACCENT : DIM,
-                        border: `1px solid ${form.colors.includes(tag) ? ACCENT : BORDER}`,
-                      }}
-                    >
-                      {tag}
-                    </button>
-                  ))}
+              {/* 소매 길이 (상의일 때만) */}
+              {form.category === '상의' && (
+                <div>
+                  <label style={{ color: DIM, fontSize: 12, display: 'block', marginBottom: 6 }}>
+                    소매 길이
+                    {form.sleeveType && <span style={{ color: ACCENT, marginLeft: 6 }}>✓ 자동분류됨</span>}
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {['민소매', '반팔', '긴팔'].map(tag => (
+                      <button
+                        key={tag}
+                        onClick={() => setForm({ ...form, sleeveType: tag })}
+                        className="cursor-pointer transition-colors"
+                        style={{
+                          padding: '6px 14px', borderRadius: 8, fontSize: 13, fontWeight: 500,
+                          backgroundColor: form.sleeveType === tag ? ACCENT : CARD2,
+                          color: form.sleeveType === tag ? BTN_TEXT : DIM,
+                          border: `1px solid ${form.sleeveType === tag ? ACCENT : BORDER}`,
+                        }}
+                      >{tag}</button>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
-              {/* 소재 태그 */}
-              <div>
-                <label style={{ color: DIM, fontSize: 12, display: 'block', marginBottom: 6 }}>소재</label>
-                <div className="flex flex-wrap gap-2">
-                  {MATERIAL_TAGS.map((tag) => (
-                    <button
-                      key={tag}
-                      onClick={() => toggleTag('materials', tag)}
-                      className="cursor-pointer transition-colors"
-                      style={{
-                        padding: '5px 12px', borderRadius: 20, fontSize: 12,
-                        backgroundColor: form.materials.includes(tag) ? `${ACCENT}20` : CARD,
-                        color: form.materials.includes(tag) ? ACCENT : DIM,
-                        border: `1px solid ${form.materials.includes(tag) ? ACCENT : BORDER}`,
-                      }}
-                    >
-                      {tag}
-                    </button>
-                  ))}
+              {/* 하의 기장 (하의일 때만) */}
+              {form.category === '하의' && (
+                <div>
+                  <label style={{ color: DIM, fontSize: 12, display: 'block', marginBottom: 6 }}>
+                    기장
+                    {form.bottomLength && <span style={{ color: ACCENT, marginLeft: 6 }}>✓ 자동분류됨</span>}
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {['반바지', '긴바지'].map(tag => (
+                      <button
+                        key={tag}
+                        onClick={() => setForm({ ...form, bottomLength: tag })}
+                        className="cursor-pointer transition-colors"
+                        style={{
+                          padding: '6px 14px', borderRadius: 8, fontSize: 13, fontWeight: 500,
+                          backgroundColor: form.bottomLength === tag ? ACCENT : CARD2,
+                          color: form.bottomLength === tag ? BTN_TEXT : DIM,
+                          border: `1px solid ${form.bottomLength === tag ? ACCENT : BORDER}`,
+                        }}
+                      >{tag}</button>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               <button
                 onClick={handleSave}

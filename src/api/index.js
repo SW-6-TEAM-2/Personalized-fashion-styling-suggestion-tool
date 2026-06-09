@@ -38,6 +38,7 @@ export const closetAPI = {
   getOne: (id) => api.get(`/closet/${id}`),
   add: (formData) => api.post('/closet', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
+    timeout: 120000,  // CLIP 처리 포함하므로 2분으로 설정
   }),
   delete: (id) => api.delete(`/closet/${id}`),
   removeBackground: (formData) => api.post('/closet/remove-bg', formData, {
@@ -46,7 +47,7 @@ export const closetAPI = {
 }
 
 export const ootdAPI = {
-  recommend: (keywords) => api.post('/ootd/recommend', { keywords }),
+  recommend: (keywords, temperature) => api.post('/ootd/recommend', { keywords, temperature }),
   refresh: (category) => api.post('/ootd/refresh', { category }),
 }
 

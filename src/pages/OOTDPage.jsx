@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import useAuthStore from '../store/useAuthStore'
@@ -16,30 +16,78 @@ const ACCENT_BTN = '#111111'
 const BTN_TEXT = '#ffffff'
 const TAG_BG = '#f2f2f2'
 
-const GENRES = ['#캐주얼', '#미니멀', '#클래식', '#스트릿', '#워크웨어', '#시티보이']
+const GENRES = ['#캐주얼', '#미니멀', '#클래식', '#스트릿']
+
+function getWeatherEmoji(code) {
+  if (code === 0) return '☀️'
+  if (code <= 2) return '🌤️'
+  if (code === 3) return '☁️'
+  if (code <= 48) return '🌫️'
+  if (code <= 55) return '🌦️'
+  if (code <= 65) return '🌧️'
+  if (code <= 77) return '🌨️'
+  if (code <= 82) return '🌦️'
+  if (code <= 99) return '⛈️'
+  return '⛅'
+}
+
+function getTempGuide(temp) {
+  if (temp === null) return null
+  if (temp >= 28) return '☀️ 반팔·반바지 위주로 추천할게요'
+  if (temp >= 23) return '🌤 반팔에 가벼운 옷 위주로 추천할게요'
+  if (temp >= 20) return '🌤 반바지도 가능한 날씨예요'
+  if (temp >= 17) return '🌥 긴팔 위주로 추천할게요'
+  if (temp >= 12) return '🧥 긴팔 + 아우터를 포함해 추천할게요'
+  return '❄️ 두꺼운 아우터 필수예요'
+}
 
 export default function OOTDPage() {
   const navigate = useNavigate()
   const { user } = useAuthStore()
   const name = user?.name || '사용자'
 
-  const [selectedGenres, setSelectedGenres] = useState([])
+  const [selectedGenre, setSelectedGenre] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [weather, setWeather] = useState(null)
+  const [city, setCity] = useState('')
+
+  // 위치 기반 날씨 자동 조회 (MainPage와 동일한 API)
+  useEffect(() => {
+    const fetchWeather = (lat, lon, cityName) => {
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=Asia%2FSeoul`)
+        .then(res => res.json())
+        .then(data => {
+          setWeather(data.current_weather)
+          setCity(cityName)
+        })
+        .catch(() => {})
+    }
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        pos => fetchWeather(pos.coords.latitude, pos.coords.longitude, '현재 위치'),
+        ()  => fetchWeather(37.5665, 126.9780, 'Seoul')
+      )
+    } else {
+      fetchWeather(37.5665, 126.9780, 'Seoul')
+    }
+  }, [])
+
+  const temperature = weather ? Math.round(weather.temperature) : null
 
   const toggleGenre = (genre) => {
-    setSelectedGenres(prev =>
-      prev.includes(genre) ? prev.filter(g => g !== genre) : [...prev, genre]
-    )
+    setSelectedGenre(prev => (prev === genre ? null : genre))
   }
 
   const handleRecommend = async () => {
+    if (!selectedGenre) return
     setLoading(true)
-    const keywords = [...selectedGenres]
+    const keywords = [selectedGenre]
     try {
-      const res = await ootdAPI.recommend({ keywords })
-      navigate('/ootd/result', { state: { outfit: res.data, keywords } })
+      const res = await ootdAPI.recommend(keywords, temperature)
+      navigate('/ootd/result', { state: { outfit: res.data, keywords, temperature } })
     } catch {
-      navigate('/ootd/result', { state: { outfit: [], keywords } })
+      navigate('/ootd/result', { state: { outfit: [], keywords, temperature } })
     } finally {
       setLoading(false)
     }
@@ -58,7 +106,24 @@ export default function OOTDPage() {
             오늘은 어떤<br />
             무드예요?
           </h1>
-          <p style={{ color: DIM, fontSize: 18, lineHeight: 1.8, marginBottom: 40 }}>
+
+          {/* 현재 기온 표시 (자동, 수정 불가) */}
+          {weather && (
+            <div
+              className="flex items-center gap-3"
+              style={{ backgroundColor: TAG_BG, border: `1px solid ${BORDER}`, borderRadius: 12, padding: '10px 16px', marginBottom: 20, width: 'fit-content' }}
+            >
+              <span style={{ fontSize: 20 }}>{getWeatherEmoji(weather.weathercode)}</span>
+              <div>
+                <p style={{ color: TEXT, fontSize: 15, fontWeight: 600 }}>
+                  {temperature}° · {city}
+                </p>
+                <p style={{ color: DIM, fontSize: 11 }}>{getTempGuide(temperature)}</p>
+              </div>
+            </div>
+          )}
+
+          <p style={{ color: DIM, fontSize: 18, lineHeight: 1.8, marginBottom: 28 }}>
             스타일 키워드를 골라주시면<br />
             딱 맞는 OOTD를 추천해드려요.
           </p>
@@ -66,7 +131,7 @@ export default function OOTDPage() {
           {/* 스타일 태그 */}
           <div className="flex flex-wrap gap-3" style={{ marginBottom: 32 }}>
             {GENRES.map(genre => {
-              const active = selectedGenres.includes(genre)
+              const active = selectedGenre === genre
               return (
                 <button
                   key={genre}
@@ -91,8 +156,8 @@ export default function OOTDPage() {
           {/* CTA 버튼 */}
           <button
             onClick={handleRecommend}
-            disabled={loading}
-            className="flex items-center justify-between cursor-pointer hover:opacity-90 transition-opacity disabled:opacity-60"
+            disabled={loading || !selectedGenre}
+            className="flex items-center justify-between cursor-pointer hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
             style={{
               width: '100%',
               backgroundColor: ACCENT_BTN,

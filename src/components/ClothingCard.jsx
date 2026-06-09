@@ -14,9 +14,9 @@ export default function ClothingCard({ item, onDelete }) {
       style={{ backgroundColor: CARD, border: `1px solid ${BORDER}` }}
       onClick={() => navigate(`/closet/${item.id}`)}
     >
-      <div className="aspect-square flex items-center justify-center p-4" style={{ backgroundColor: '#f2f2f2' }}>
+      <div className="flex items-center justify-center" style={{ backgroundColor: '#f2f2f2', aspectRatio: '1/1', padding: '6px' }}>
         {item.imageUrl ? (
-          <img src={item.imageUrl} alt={item.name} className="w-full h-full object-contain" />
+          <img src={item.imageUrl} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
         ) : (
           <div style={{ color: DIM, fontSize: 12 }}>{item.category}</div>
         )}
