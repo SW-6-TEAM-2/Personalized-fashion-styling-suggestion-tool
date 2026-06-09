@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+@theme {
+  --color-accent: #d44f1f;
+  --color-accent-dark: #b8401a;
+  --color-bg: #0d0d0d;
+  --color-card: #161616;
+  --color-card2: #1e1e1e;
+  --color-border: #282828;
+  --color-text: #f0ece6;
+  --color-text-dim: #6b6b6b;
+  --color-tag: #1e1e1e;
+  --color-btn-text: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #0d0d0d;
+  color: #f0ece6;
+  font-family: 'Pretendard', system-ui, sans-serif;
+  min-height: 100vh;
+}
+
+/* 로고 — Playfair Display (세리프로 개성) */
+.font-logo {
+  font-family: 'Playfair Display', serif;
+  letter-spacing: -0.01em;
+}
+
+/* 큰 제목 — Pretendard 볼드 */
+.font-heading {
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px #22292f inset;
+  -webkit-text-fill-color: #f8f2f0;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: #181d22; }
+::-webkit-scrollbar-thumb { background: #2e3a42; border-radius: 2px; }
